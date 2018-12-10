@@ -1,0 +1,81 @@
+<!-- index.wxml -->
+
+<view class="userinfo">
+  <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+  <block wx:else>
+    <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+    <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+  </block>
+</view>
+
+<view class="container">
+
+  <!-- 用户 openid -->
+  <!--
+  <view class="userinfo">
+    <button open-type="getUserInfo" bindgetuserinfo="onGetUserInfo" class="userinfo-avatar" style="background-image: url({{avatarUrl}})"></button>
+    
+    <view>
+      <button class="userinfo-nickname" bindtap="onGetOpenid">点击获取 openid</button>
+    </view>
+    style='height:500px'
+  </view>
+-->
+
+  <view class="swiper" style="text-align: center;">
+    <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" style='height:600rpx;'>
+      <block wx:for="{{lastImgUrls}}" wx:key="*this">
+        <swiper-item>
+          <image src="{{item}}" data-src="{{item}}"  style='width:100%;height:100%'class="slide-image" bindtap="preview_img" />
+        </swiper-item>
+      </block>
+    </swiper>
+  </view>
+
+  <!-- 上传图片 -->
+  <view class="uploader">
+    <view class="uploader-text" bindtap="doUpload">
+      <text>上传图片</text>
+    </view>
+    <view class="uploader-container" wx:if="{{imgUrl}}">
+      <image class="uploader-image" src="{{imgUrl}}" mode="aspectFit" bindtap="previewImg"></image>
+    </view>
+  </view>
+  <!-- 下载图片 
+  <view class="downloader">
+    <view class="downloader-text" bindtap="dodownload">
+      <text>下载图片</text>
+    </view>
+    <view class="downloader-container" wx:if="{{imgUrl}}">
+      <image class="downloader-image" src="{{imgUrl}}" mode="aspectFit" bindtap="previewImg"></image>
+    </view>
+  </view> -->
+  <loading hidden="{{loadingHidden}}">图片下载中...</loading>
+  <!-- 操作数据库
+  <view class="uploader">
+    <navigator url="../databaseGuide/databaseGuide" open-type="navigate" class="uploader-text">
+      <text>前端操作数据库</text>
+    </navigator>
+  </view> -->
+  <!-- 新建云函数 
+  <view class="uploader">
+    <navigator url="../addFunction/addFunction" open-type="navigate" class="uploader-text">
+      <text>快速新建云函数</text>
+    </navigator>
+  </view> -->
+  <!-- <view><image class="index-logo" src='{{img_l}}' bindtap='preview_img'></image></view> -->
+  <!-- <view class="gridview" style='background:white;'>
+    <view class="gridview-item" wx:for="{{imgUrls}}" wx:key="*this">
+      <view class='gridview-item__bg'>
+          <image src="{{item}}" data-src="{{item}}" class="slide-image" bindtap="preview_img" />
+        </view> 
+    </view>
+  </view> -->
+</view>
+<scroll-view scroll-y="true" style="height: 300rpx;" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll">
+  <view class='function_container'>
+    <view class='function_item' wx:for="{{imgUrls}}">
+      <image src="{{item}}" data-src="{{item}}" mode="aspectFit" class="function_img" bindtap="preview_img" />
+    </view>
+  </view>
+</scroll-view>
