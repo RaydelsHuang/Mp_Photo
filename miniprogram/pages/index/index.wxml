@@ -72,9 +72,9 @@
     </view>
   </view> -->
 </view>
-<scroll-view scroll-y="true" style="height: 300rpx;" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll">
+<scroll-view scroll-y="true" style="height: 300rpx;" >
   <view class='function_container'>
-    <view class='function_item' wx:for="{{imgUrls}}">
+    <view class='function_item' wx:for="{{imgUrls}}"wx:key="*this">
       <image src="{{item}}" data-src="{{item}}" mode="aspectFit" class="function_img" bindtap="preview_img" />
     </view>
   </view>

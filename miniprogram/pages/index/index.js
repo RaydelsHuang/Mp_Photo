@@ -9,20 +9,20 @@ Page({
     takeSession: false,
     requestResult: '',
     img_l: '',
-    loadingHidden: true,     // 等待状态
+    loadingHidden: true, // 等待状态
 
     //关于swiper
     imgUrls: ['photo1.png'],
     lastImgUrls: [],
     indicatorDots: true,
     vertical: false,
-    autoplay: true,
+    autoplay: false,
     interval: 10000,
     duration: 1000,
-    lastIndex:6
+    lastIndex: 6
   },
 
-  onLoad: function () {
+  onLoad: function() {
     if (!wx.cloud) {
       wx.redirectTo({
         url: '../chooseLib/chooseLib',
@@ -46,11 +46,10 @@ Page({
         }
       }
     })
-
-   this.onQueryPic_db();
+    this.onQueryPic_db();
   },
 
-  onGetUserInfo: function (e) {
+  onGetUserInfo: function(e) {
     if (!this.logged && e.detail.userInfo) {
       this.setData({
         logged: true,
@@ -60,7 +59,7 @@ Page({
     }
   },
 
-  onGetOpenid: function () {
+  onGetOpenid: function() {
     // 调用云函数
     wx.cloud.callFunction({
       name: 'login',
@@ -81,10 +80,48 @@ Page({
     })
   },
 
+
+  onSearchUserInfo_db_cloud: function() {
+    wx.cloud.callFunction({
+      // 云函数名称
+      name: 'searchUserInfo_db',
+      // 传给云函数的参数
+      data: {
+        addkey: "user",
+        openid: app.globalData.openid,
+      },
+      success: function(res) {
+        console.log(res.result) // 3
+      },
+      fail: console.error
+    })
+  },
+
+  onAddUserInfo_db_cloud: function() {
+    wx.cloud.callFunction({
+      // 云函数名称
+      name: 'addUserInfo_db',
+      // 传给云函数的参数
+      data: {
+        addkey: "user",
+        nickName: this.data.userInfo.nickName,
+        avatarUrl: this.data.userInfo.avatarUrl,
+        gender: this.data.userInfo.gender,
+        city: this.data.userInfo.city,
+      },
+      success: function(res) {
+        console.log(res.result) // 3
+      },
+      fail: console.error
+    })
+  },
+
+
+
   // 上传图片
-  doUpload: function () {
-    var that = this
-    this.chooseUploadImg(function (callback) {
+  doUpload: function() {
+    //this.onSearchUserInfo_db_cloud()
+    this.chooseUploadImg(function(callback) {
       that.doUploadImg(callback)
     })
 
@@ -92,7 +129,7 @@ Page({
   },
 
 
-  doUploadImg: function (res) {
+  doUploadImg: function(res) {
     wx.showLoading({
       title: '上传中',
     })
@@ -138,13 +175,13 @@ Page({
     })
   },
 
-  chooseUploadImg: function (callback) {
+  chooseUploadImg: function(callback) {
     // 选择图片
     wx.chooseImage({
       count: 1,
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
-      success: function (res) {
+      success: function(res) {
         callback(res)
       },
       fail: e => {
@@ -155,7 +192,7 @@ Page({
 
 
   // 下载图片
-  dodownload: function () {
+  dodownload: function() {
     this.setData({
       loadingHidden: false
     })
@@ -183,8 +220,8 @@ Page({
   },
 
   //预览照片
-  preview_img: function (e) {//图片预览函数
-    var current=e.target.dataset.src;
+  preview_img: function(e) { //图片预览函数
+    var current = e.target.dataset.src;
     wx.previewImage({
       current: current, // 当前显示图片的http链接
       urls: this.data.imgUrls // 需要预览的图片http链接列表
@@ -193,13 +230,13 @@ Page({
 
 
   //添加照片到数据库
-  onAddPic_db: function (picId, fileId) {
+  onAddPic_db: function(picId, fileId) {
     const db = wx.cloud.database()
     db.collection('pictures').add({
       data: {
         id: picId,
         path: fileId,
-        date:1,
+        date: 1,
       },
       success: res => {
         // 在返回结果中会包含新创建的记录的 _id
@@ -222,12 +259,13 @@ Page({
   },
 
   //数据库查询照片
-  onQueryPic_db: function () {
+  onQueryPic_db: function() {
     var that = this
     const db = wx.cloud.database()
     // 查询当前用户所有的 counters
     db.collection('pictures').where({
       //_openid: this.data.openid
+      date: 1
     }).get({
       success: res => {
         //console.log(res);
@@ -237,11 +275,11 @@ Page({
         //console.log('[数据库] [查询记录] 成功: ', res)
 
         var arr = res.data;
-        var patharr=[];
-        var lastPatharr=[];
-        for (var i = 0, len = arr.length; i < len; i++) {            
-          patharr.push(arr[i].path)    
-          if(i>(len-that.data.lastIndex)){
+        var patharr = [];
+        var lastPatharr = [];
+        for (var i = 0, len = arr.length; i < len; i++) {
+          patharr.push(arr[i].path)
+          if (i > (len - that.data.lastIndex)) {
             lastPatharr.push(arr[i].path)
           }
         }
@@ -251,8 +289,8 @@ Page({
         that.setData({
           lastImgUrls: lastPatharr
         })
-        
-        console.log(that.data.imgUrls)
+
+        //console.log(that.data.imgUrls)
       },
       fail: err => {
         wx.showToast({
