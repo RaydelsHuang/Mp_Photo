@@ -81,7 +81,7 @@ Page({
   },
 
 
-  onSearchUserInfo_db_cloud: function() {
+  onSearchUserInfo_db_cloud: function(callback) {
     wx.cloud.callFunction({
       // 云函数名称
       name: 'searchUserInfo_db',
@@ -91,7 +91,7 @@ Page({
         openid: app.globalData.openid,
       },
       success: function(res) {
-        console.log(res.result) // 3
+        callback(res.result.data.length == 0 ? false : true);
       },
       fail: console.error
     })
@@ -116,16 +116,23 @@ Page({
     })
   },
 
+  UpdateUserInfo: function() {
+    this.onSearchUserInfo_db_cloud(function(hasInfo) {
+      if (!hasInfo) {
+        onAddUserInfo_db_cloud()
+      }
+    })
+  },
 
+  GetInvitecode: function () {
+
+  },
 
   // 上传图片
   doUpload: function() {
-    //this.onSearchUserInfo_db_cloud()
     this.chooseUploadImg(function(callback) {
       that.doUploadImg(callback)
     })
-
-
   },
 
 
