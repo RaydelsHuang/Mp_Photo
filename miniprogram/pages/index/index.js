@@ -10,7 +10,9 @@ Page({
     requestResult: '',
     img_l: '',
     loadingHidden: true, // 等待状态
-
+    userid: '', //在user表中的id
+    otherInviteCode:'',//填入别人的邀请码
+    userInviteCode: '',//自己的邀请码
     //关于swiper
     imgUrls: ['photo1.png'],
     lastImgUrls: [],
@@ -46,7 +48,12 @@ Page({
         }
       }
     })
+    this.UpdateUserInfo();
     this.onQueryPic_db();
+  },
+
+  onTest: function(e) {
+    this.GetUpdateInvitecode()
   },
 
   onGetUserInfo: function(e) {
@@ -82,6 +89,7 @@ Page({
 
 
   onSearchUserInfo_db_cloud: function(callback) {
+    var that = this
     wx.cloud.callFunction({
       // 云函数名称
       name: 'searchUserInfo_db',
@@ -91,13 +99,20 @@ Page({
         openid: app.globalData.openid,
       },
       success: function(res) {
-        callback(res.result.data.length == 0 ? false : true);
+        var hasUser = res.result.data.length == 0 ? false : true
+        if (hasUser) {
+          that.setData({
+            userid: res.result.data[0]._id
+          })
+        }
+        callback(hasUser);
       },
       fail: console.error
     })
   },
 
   onAddUserInfo_db_cloud: function() {
+    var that=this
     wx.cloud.callFunction({
       // 云函数名称
       name: 'addUserInfo_db',
@@ -111,25 +126,84 @@ Page({
       },
       success: function(res) {
         console.log(res.result) // 3
+        //创建完角色 生成个人邀请码
+        that.GetUpdateInvitecode()
+      },
+      fail: console.error
+    })
+  },
+
+  //添加邀请码
+  onAddInviteCode_db_cloud: function () {
+    wx.cloud.callFunction({
+      // 云函数名称
+      name: 'addUserInfo_db',
+      // 传给云函数的参数
+      data: {
+        addkey: "invitecode",
+        code: this.data.userInviteCode,        
+      },
+      success: function (res) {
+        console.log(res.result) // 3
       },
       fail: console.error
     })
   },
 
   UpdateUserInfo: function() {
+    var that = this
     this.onSearchUserInfo_db_cloud(function(hasInfo) {
       if (!hasInfo) {
-        onAddUserInfo_db_cloud()
+        that.onAddUserInfo_db_cloud()
       }
     })
   },
 
-  GetInvitecode: function () {
-
+  // 更新邀请码(otherinvitecode)
+  UpdateUserInfoInvitecode: function() {
+    wx.cloud.callFunction({
+      // 云函数名称
+      name: 'update_db',
+      // 传给云函数的参数
+      data: {
+        addkey: "user",
+        userid: this.data.userid,
+        updatekey: "otherinvitecode",
+        newdata: this.data.otherInviteCode,
+      },
+      success: function(res) {
+        console.log(res.result);
+      },
+      fail: console.error
+    })
   },
+
+  // 生成邀请码(userinvitecode)
+  GetUpdateInvitecode: function () {
+    var that=this
+    wx.cloud.callFunction({
+      // 云函数名称
+      name: 'orderby_db',
+      // 传给云函数的参数
+      data: {
+        addkey: "invitecode",
+        sortkey: "code",
+        sortway: "desc",        
+      },
+      success: function (res) {
+        that.setData({
+          userInviteCode: res.result.data[0].code+1
+        })
+        that.onAddInviteCode_db_cloud()       
+      },
+      fail: console.error
+    })
+  },
+
 
   // 上传图片
   doUpload: function() {
+    var that = this
     this.chooseUploadImg(function(callback) {
       that.doUploadImg(callback)
     })

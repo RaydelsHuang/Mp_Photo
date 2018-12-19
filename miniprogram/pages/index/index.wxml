@@ -5,6 +5,7 @@
   <block wx:else>
     <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
     <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+    <text class="user-invitecode">{{userInviteCode}}</text>
   </block>
 </view>
 
@@ -26,7 +27,7 @@
     <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" style='height:600rpx;'>
       <block wx:for="{{lastImgUrls}}" wx:key="*this">
         <swiper-item>
-          <image src="{{item}}" data-src="{{item}}"  style='width:100%;height:100%'class="slide-image" bindtap="preview_img" />
+          <image src="{{item}}" data-src="{{item}}" style='width:100%;height:100%' class="slide-image" bindtap="preview_img" />
         </swiper-item>
       </block>
     </swiper>
@@ -40,6 +41,13 @@
     <view class="uploader-container" wx:if="{{imgUrl}}">
       <image class="uploader-image" src="{{imgUrl}}" mode="aspectFit" bindtap="previewImg"></image>
     </view>
+  </view>
+
+  <!-- 测试 -->
+  <view class="uploader">
+    <view class="uploader-text" bindtap="onTest">
+      <text>测试</text>
+    </view>    
   </view>
   <!-- 下载图片 
   <view class="downloader">
@@ -72,9 +80,9 @@
     </view>
   </view> -->
 </view>
-<scroll-view scroll-y="true" style="height: 300rpx;" >
+<scroll-view scroll-y="true" style="height: 300rpx;">
   <view class='function_container'>
-    <view class='function_item' wx:for="{{imgUrls}}"wx:key="*this">
+    <view class='function_item' wx:for="{{imgUrls}}" wx:key="*this">
       <image src="{{item}}" data-src="{{item}}" mode="aspectFit" class="function_img" bindtap="preview_img" />
     </view>
   </view>
